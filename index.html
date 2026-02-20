@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="dark light" />
+  <title>CanonDB — каноничный порядок просмотра</title>
+  <style>
+    :root{
+      --bg: #0b1020;
+      --surface: rgba(255,255,255,.06);
+      --surface2: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.65);
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --brand: #6ee7ff;
+      --brand2:#a78bfa;
+      --ok: #22c55e;
+      --warn:#f59e0b;
+      --radius: 16px;
+      --radius2: 22px;
+      --gap: 16px;
+      --max: 1120px;
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+    [data-theme="light"]{
+      --bg: #f7f8fc;
+      --surface: rgba(20,20,40,.05);
+      --surface2: rgba(20,20,40,.08);
+      --text: rgba(10,10,18,.92);
+      --muted: rgba(10,10,18,.62);
+      --border: rgba(10,10,18,.10);
+      --shadow: 0 18px 40px rgba(10,10,18,.10);
+      --brand: #0077ff;
+      --brand2:#7c3aed;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 20% -10%, rgba(110,231,255,.18), transparent 60%),
+        radial-gradient(900px 650px at 90% 10%, rgba(167,139,250,.18), transparent 55%),
+        radial-gradient(900px 650px at 30% 120%, rgba(34,197,94,.10), transparent 55%),
+        var(--bg);
+      line-height:1.45;
+    }
+    a{color:inherit}
+    .wrap{max-width:var(--max); margin:0 auto; padding:22px 18px 70px}
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+      padding:14px 16px;
+      border:1px solid var(--border);
+      background:linear-gradient(180deg, var(--surface2), var(--surface));
+      border-radius:var(--radius2);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow);
+      position: sticky; top: 14px; z-index: 5;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; text-decoration:none;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .logo{
+      width:34px; height:34px; border-radius:12px;
+      background: radial-gradient(circle at 30% 30%, var(--brand), transparent 55%),
+                  radial-gradient(circle at 70% 70%, var(--brand2), transparent 55%),
+                  rgba(255,255,255,.08);
+      border:1px solid var(--border);
+    }
+    nav{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+    .chip{
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.03);
+      color:var(--muted);
+      font-weight:600;
+      font-size:14px;
+    }
+    .chip:hover{background:rgba(255,255,255,.06); color:var(--text)}
+    .right{display:flex; align-items:center; gap:10px}
+    .btn{
+      appearance:none; border:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:700;
+      cursor:pointer;
+      font-family:inherit;
+      font-size:14px;
+    }
+    .btn:hover{background:rgba(255,255,255,.09)}
+    .btn:focus-visible, .chip:focus-visible, .input:focus-visible{
+      outline: 3px solid rgba(110,231,255,.35);
+      outline-offset: 2px;
+    }
+    .btn.primary{
+      border-color: rgba(110,231,255,.30);
+      background: linear-gradient(180deg, rgba(110,231,255,.18), rgba(167,139,250,.10));
+    }
+    .hero{
+      margin-top:18px;
+      padding:40px 28px 28px;
+      border-radius:var(--radius2);
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      box-shadow: var(--shadow);
+    }
+    .heroGrid{
+      display:grid;
+      grid-template-columns: 1.35fr .65fr;
+      gap:18px;
+      align-items:start;
+    }
+    h1{
+      font-size: clamp(30px, 4vw, 46px);
+      line-height:1.07;
+      margin:0 0 12px;
+      letter-spacing:-.6px;
+    }
+    .lead{margin:0 0 18px; color:var(--muted); font-size:16px}
+    .searchRow{display:flex; gap:10px; flex-wrap:wrap}
+    .input{
+      flex: 1 1 360px;
+      min-width: 260px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.18);
+      color:var(--text);
+      font-weight:600;
+      font-family:inherit;
+      font-size:14px;
+    }
+    [data-theme="light"] .input{background: rgba(255,255,255,.75)}
+    .kbd{
+      display:inline-flex; align-items:center; gap:6px;
+      color:var(--muted);
+      font-weight:700; font-size:13px;
+      border:1px dashed var(--border);
+      padding:8px 10px;
+      border-radius:12px;
+      user-select:none;
+    }
+    .stats{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .stat{
+      padding:14px;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+    }
+    .stat b{display:block; font-size:22px; margin-bottom:2px;}
+    .stat span{color:var(--muted); font-weight:600; font-size:12px}
+    .section{
+      margin-top:18px;
+      padding:22px;
+      border-radius:var(--radius2);
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.035);
+    }
+    .sectionHead{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+      margin-bottom:12px;
+    }
+    .section h2{margin:0; font-size:20px; letter-spacing:-.2px}
+    .section p{margin:4px 0 0; color:var(--muted); font-weight:600; font-size:14px}
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:12px;
+      margin-top:12px;
+    }
+    .card{
+      grid-column: span 4;
+      padding:16px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      text-decoration:none;
+      display:flex; flex-direction:column; gap:10px;
+      min-height: 128px;
+      transition: background .15s;
+    }
+    .card:hover{background: rgba(255,255,255,.07)}
+    .cardTop{
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start
+    }
+    .title{font-weight:800; letter-spacing:-.2px; color:var(--text);}
+    .meta{display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); font-weight:700; font-size:13px}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color:var(--muted);
+      font-weight:800; font-size:12px;
+    }
+    .badge.ok{color: rgba(34,197,94,.95); border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.10)}
+    .badge.warn{color: rgba(245,158,11,.95); border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.10)}
+    .list{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    .row{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      border-radius:18px;
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      text-decoration:none;
+      transition: background .15s;
+    }
+    .row:hover{background: rgba(255,255,255,.06)}
+    .rowLeft{display:flex; flex-direction:column; gap:4px}
+    .rowTitle{font-weight:850; color:var(--text);}
+    .rowSub{color:var(--muted); font-weight:700; font-size:13px}
+    .rowRight{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    footer{
+      margin-top:18px;
+      padding:22px;
+      border-radius:var(--radius2);
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color:var(--muted);
+      font-weight:650;
+      font-size:14px;
+    }
+    .footGrid{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap:12px;
+      margin-top:16px;
+    }
+    .footGrid a{color:inherit; text-decoration:none}
+    .footGrid a:hover{color:var(--text)}
+    .mutedSmall{font-size:13px; color:var(--muted)}
+    .overlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.6);
+      display:none; align-items:center; justify-content:center;
+      padding:18px; z-index: 50;
+    }
+    .overlay.open{display:flex}
+    .modal{
+      width:min(720px, 100%);
+      border-radius:20px;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(30,30,50,.98), rgba(20,20,38,.98));
+      backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      padding:18px;
+    }
+    [data-theme="light"] .modal{background: linear-gradient(180deg,#fff,#f7f8fc);}
+    .modalHead{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
+    .modalHead b{letter-spacing:-.2px; font-size:16px;}
+    .hint{color:var(--muted); font-weight:700; font-size:13px}
+    .results{margin-top:10px; display:grid; gap:8px}
+    .pill{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      border-radius:14px;
+      padding:12px 14px;
+      display:flex; justify-content:space-between; gap:10px;
+      cursor:pointer;
+      transition: background .12s;
+    }
+    .pill:hover{background: rgba(255,255,255,.07);}
+    .pill span{color:var(--muted); font-weight:700; font-size:13px}
+    @media (max-width: 900px){
+      .heroGrid{grid-template-columns: 1fr}
+      .card{grid-column: span 6}
+      .footGrid{grid-template-columns: 1fr}
+      nav{display:none}
+    }
+    @media (max-width: 560px){
+      .card{grid-column: span 12}
+      .stats{grid-template-columns: 1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar" role="banner">
+      <a class="brand" href="#" aria-label="CanonDB">
+        <span class="logo" aria-hidden="true"></span>
+        <span>CanonDB</span>
+      </a>
+      <nav aria-label="Навигация">
+        <a class="chip" href="#franchises">Франшизы</a>
+        <a class="chip" href="#chronologies">Хронологии</a>
+        <a class="chip" href="#activity">Активность</a>
+        <a class="chip" href="#about">О проекте</a>
+      </nav>
+      <div class="right">
+        <button class="btn" id="openSearch" type="button" aria-haspopup="dialog" aria-controls="searchModal">
+          Поиск <span class="mutedSmall">⌘K</span>
+        </button>
+        <button class="btn" id="toggleTheme" type="button" aria-label="Переключить тему">☀︎ Тема</button>
+        <button class="btn primary" type="button">Войти</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="heroGrid">
+          <div>
+            <p class="mutedSmall" style="margin:0 0 10px; font-weight:800;">
+              Создано сообществом для сообщества
+            </p>
+            <h1 id="heroTitle">Найдите правильный порядок просмотра</h1>
+            <p class="lead">Каноничные порядки для фильмов, сериалов, игр и аниме — составленные и проверенные участниками.</p>
+            <div class="searchRow" role="search">
+              <input class="input" id="q" placeholder="Например: Marvel, Star Wars, Ведьмак, Fate…" autocomplete="off" />
+              <button class="btn primary" id="searchBtn" type="button">Искать</button>
+              <span class="kbd" title="Открыть поиск">⌘K</span>
+            </div>
+            <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
+              <a class="badge" href="#franchises">Смотреть франшизы</a>
+              <a class="badge" href="#chronologies">Свежие хронологии</a>
+              <a class="badge" href="#rules">Правила</a>
+            </div>
+          </div>
+          <div class="stats" aria-label="Статистика">
+            <div class="stat"><b>6+</b><span>Франшиз в базе</span></div>
+            <div class="stat"><b>8+</b><span>Хронологий</span></div>
+            <div class="stat"><b>8+</b><span>Участников</span></div>
+            <div class="stat"><b>∞</b><span>Каноничных споров</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="franchises" aria-labelledby="frTitle">
+        <div class="sectionHead">
+          <div>
+            <h2 id="frTitle">Популярные франшизы</h2>
+            <p>Самые обсуждаемые медиавселенные</p>
+          </div>
+          <a class="chip" href="#" style="display:inline-flex;">Все франшизы</a>
+        </div>
+        <div class="grid">
+          <a class="card" href="#">
+            <div class="cardTop">
+              <div class="title">Звёздные войны</div>
+              <span class="badge ok">★ 5.0</span>
+            </div>
+            <div class="meta">
+              <span class="badge">18 элементов</span>
+              <span class="badge">3 хронологии</span>
+            </div>
+            <div class="mutedSmall">От приквелов до спин-оффов — без спойлеров.</div>
+          </a>
+          <a class="card" href="#">
+            <div class="cardTop">
+              <div class="title">Marvel (MCU)</div>
+              <span class="badge warn">★ 4.0</span>
+            </div>
+            <div class="meta">
+              <span class="badge">13 элементов</span>
+              <span class="badge">1 хронология</span>
+            </div>
+            <div class="mutedSmall">Сортировка по фазам, релизу или таймлайну.</div>
+          </a>
+          <a class="card" href="#">
+            <div class="cardTop">
+              <div class="title">The Legend of Zelda</div>
+              <span class="badge">—</span>
+            </div>
+            <div class="meta">
+              <span class="badge">3 элемента</span>
+              <span class="badge">2 хронологии</span>
+            </div>
+            <div class="mutedSmall">Разные ветки таймлайна в одном порядке.</div>
+          </a>
+        </div>
+      </section>
+
+      <section class="section" id="chronologies" aria-labelledby="chTitle">
+        <div class="sectionHead">
+          <div>
+            <h2 id="chTitle">Недавние хронологии</h2>
+            <p>Свежие порядки просмотра от участников</p>
+          </div>
+          <a class="chip" href="#" style="display:inline-flex;">Все хронологии</a>
+        </div>
+        <div class="list" role="list">
+          <a class="row" href="#" role="listitem">
+            <div class="rowLeft">
+              <div class="rowTitle">Окарина</div>
+              <div class="rowSub">Франшиза: The Legend of Zelda</div>
+            </div>
+            <div class="rowRight">
+              <span class="badge">190 элементов</span>
+              <span class="badge">▲ 0 ▼ 0</span>
+            </div>
+          </a>
+          <a class="row" href="#" role="listitem">
+            <div class="rowLeft">
+              <div class="rowTitle">gfdgd</div>
+              <div class="rowSub">Франшиза: Звёздные войны</div>
+            </div>
+            <div class="rowRight">
+              <span class="badge">61 элемент</span>
+              <span class="badge">▲ 0 ▼ 0</span>
+            </div>
+          </a>
+          <a class="row" href="#" role="listitem">
+            <div class="rowLeft">
+              <div class="rowTitle">Суровая Россия</div>
+              <div class="rowSub">Франшиза: Блокировки</div>
+            </div>
+            <div class="rowRight">
+              <span class="badge">6010 элементов</span>
+              <span class="badge ok">▲ 2 ▼ 0</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="section" id="about" aria-labelledby="aboutTitle">
+        <div class="sectionHead">
+          <div>
+            <h2 id="aboutTitle">Зачем CanonDB?</h2>
+            <p>Быстрый поиск, единые правила, прозрачная модерация</p>
+          </div>
+        </div>
+        <div class="grid">
+          <div class="card" style="grid-column: span 4;">
+            <div class="title">🔍 Поиск</div>
+            <div class="mutedSmall">Cmd+K / Ctrl+K — мгновенный доступ к любой франшизе или хронологии.</div>
+          </div>
+          <div class="card" style="grid-column: span 4;">
+            <div class="title">⭐ Качество</div>
+            <div class="mutedSmall">Оценки, обсуждения и понятные критерии «каноничности».</div>
+          </div>
+          <div class="card" style="grid-column: span 4;">
+            <div class="title">🤝 Сообщество</div>
+            <div class="mutedSmall">Участники создают и улучшают порядки просмотра вместе.</div>
+          </div>
+        </div>
+      </section>
+
+      <footer id="rules">
+        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+          <div>
+            <div style="font-weight:900; color:var(--text); font-size:16px;">CanonDB</div>
+            <div class="mutedSmall" style="margin-top:4px;">Каноничные порядки просмотра медиаконтента.</div>
+          </div>
+          <div class="mutedSmall">© 2026</div>
+        </div>
+        <div class="footGrid">
+          <div>
+            <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Навигация</div>
+            <div style="display:grid; gap:7px;">
+              <a href="#franchises">Франшизы</a>
+              <a href="#chronologies">Хронологии</a>
+              <a href="#about">О проекте</a>
+            </div>
+          </div>
+          <div>
+            <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Категории</div>
+            <div style="display:grid; gap:7px;">
+              <a href="#">Фильмы</a>
+              <a href="#">Сериалы</a>
+              <a href="#">Аниме</a>
+              <a href="#">Игры</a>
+              <a href="#">Книги</a>
+            </div>
+          </div>
+          <div>
+            <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Информация</div>
+            <div style="display:grid; gap:7px;">
+              <a href="#">Правила</a>
+              <a href="#">Конфиденциальность</a>
+              <a href="mailto:support@canondb.ru">Контакты</a>
+              <a href="#">Поддержать проект</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal" id="searchModal">
+      <div class="modalHead">
+        <b id="modalTitle">Быстрый поиск</b>
+        <span class="hint">Esc — закрыть</span>
+      </div>
+      <input class="input" id="modalInput" style="width:100%;" placeholder="Начните вводить: Marvel, Star Wars, Zelda…" autocomplete="off" />
+      <div class="results" id="results" aria-live="polite"></div>
+      <div class="mutedSmall" style="margin-top:10px;">
+        Это прототип — поиск работает по встроенному списку.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const root = document.documentElement;
+    const stored = localStorage.getItem('theme');
+    if (stored) root.setAttribute('data-theme', stored);
+
+    document.getElementById('toggleTheme').addEventListener('click', () => {
+      const cur = root.getAttribute('data-theme') || 'dark';
+      const next = cur === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+
+    const overlay = document.getElementById('overlay');
+    const modalInput = document.getElementById('modalInput');
+    const results = document.getElementById('results');
+
+    const demo = [
+      { title: 'Звёздные войны', kind: 'Франшиза', hint: '18 элементов · 3 хронологии' },
+      { title: 'Marvel (MCU)', kind: 'Франшиза', hint: '13 элементов · 1 хронология' },
+      { title: 'The Legend of Zelda', kind: 'Франшиза', hint: '3 элемента · 2 хронологии' },
+      { title: 'Окарина', kind: 'Хронология', hint: '190 элементов' },
+      { title: 'gfdgd', kind: 'Хронология', hint: '61 элемент' },
+      { title: 'Суровая Россия', kind: 'Хронология', hint: '6010 элементов' },
+    ];
+
+    function esc(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+
+    function render(q) {
+      const t = (q||'').trim().toLowerCase();
+      const items = demo.filter(x => (x.title+' '+x.kind).toLowerCase().includes(t)).slice(0,6);
+      results.innerHTML = items.length
+        ? items.map(x => `<div class="pill"><div><div style="font-weight:800">${esc(x.title)}</div><span>${esc(x.kind)} · ${esc(x.hint)}</span></div><span>↵</span></div>`).join('')
+        : '<div class="mutedSmall">Ничего не найдено.</div>';
+    }
+
+    function openModal() {
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden','false');
+      setTimeout(()=>modalInput.focus(),0);
+      render('');
+    }
+    function closeModal() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden','true');
+    }
+
+    document.getElementById('openSearch').addEventListener('click', openModal);
+    document.getElementById('searchBtn').addEventListener('click', openModal);
+    document.getElementById('q').addEventListener('keydown', e => { if(e.key==='Enter') openModal(); });
+    overlay.addEventListener('click', e => { if(e.target===overlay) closeModal(); });
+    window.addEventListener('keydown', e => {
+      if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); openModal(); }
+      if(e.key==='Escape') closeModal();
+    });
+    modalInput.addEventListener('input', e => render(e.target.value));
+  </script>
+</body>
+</html>
