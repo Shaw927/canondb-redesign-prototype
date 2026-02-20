@@ -4,290 +4,453 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="dark light" />
-  <title>CanonDB — каноничный порядок просмотра</title>
+  <title>CanonDB — современный редизайн (прототип)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
   <style>
     :root{
-      --bg: #0b1020;
-      --surface: rgba(255,255,255,.06);
-      --surface2: rgba(255,255,255,.10);
+      --bg0:#070A12;
+      --bg1:#0B1020;
       --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.65);
-      --border: rgba(255,255,255,.12);
-      --shadow: 0 18px 50px rgba(0,0,0,.45);
-      --brand: #6ee7ff;
-      --brand2:#a78bfa;
-      --ok: #22c55e;
-      --warn:#f59e0b;
-      --radius: 16px;
-      --radius2: 22px;
-      --gap: 16px;
-      --max: 1120px;
-      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      --muted: rgba(255,255,255,.66);
+      --border: rgba(255,255,255,.10);
+      --glass: rgba(255,255,255,.06);
+      --glass2: rgba(255,255,255,.10);
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+
+      --accent:#64d2ff;
+      --accent2:#a78bfa;
+      --accent3:#22c55e;
+      --ring: rgba(100,210,255,.35);
+
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1140px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      --mx: 35vw;
+      --my: 22vh;
     }
+
     [data-theme="light"]{
-      --bg: #f7f8fc;
-      --surface: rgba(20,20,40,.05);
-      --surface2: rgba(20,20,40,.08);
-      --text: rgba(10,10,18,.92);
-      --muted: rgba(10,10,18,.62);
-      --border: rgba(10,10,18,.10);
-      --shadow: 0 18px 40px rgba(10,10,18,.10);
-      --brand: #0077ff;
-      --brand2:#7c3aed;
+      --bg0:#f6f7fb;
+      --bg1:#ffffff;
+      --text: rgba(12,14,22,.92);
+      --muted: rgba(12,14,22,.60);
+      --border: rgba(12,14,22,.10);
+      --glass: rgba(12,14,22,.04);
+      --glass2: rgba(12,14,22,.07);
+      --shadow: 0 16px 42px rgba(12,14,22,.12);
+      --ring: rgba(0,120,255,.30);
+      --accent:#0078ff;
+      --accent2:#7c3aed;
+      --accent3:#16a34a;
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
       font-family:var(--font);
       color:var(--text);
-      background:
-        radial-gradient(1200px 800px at 20% -10%, rgba(110,231,255,.18), transparent 60%),
-        radial-gradient(900px 650px at 90% 10%, rgba(167,139,250,.18), transparent 55%),
-        radial-gradient(900px 650px at 30% 120%, rgba(34,197,94,.10), transparent 55%),
-        var(--bg);
+      background: radial-gradient(1200px 800px at 10% 0%, rgba(100,210,255,.18), transparent 60%),
+                  radial-gradient(1000px 700px at 95% 18%, rgba(167,139,250,.16), transparent 55%),
+                  radial-gradient(1000px 700px at 40% 120%, rgba(34,197,94,.10), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
       line-height:1.45;
+      overflow-x:hidden;
     }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-120px;
+      pointer-events:none;
+      background: radial-gradient(520px 520px at var(--mx) var(--my), rgba(100,210,255,.14), transparent 65%),
+                  radial-gradient(560px 560px at calc(var(--mx) + 18vw) calc(var(--my) + 14vh), rgba(167,139,250,.14), transparent 65%);
+      opacity:.9;
+      z-index:-2;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" stitchTiles="stitch"/></filter><rect width="180" height="180" filter="url(%23n)" opacity=".18"/></svg>');
+      mix-blend-mode: overlay;
+      opacity: .22;
+      z-index:-1;
+    }
+
     a{color:inherit}
-    .wrap{max-width:var(--max); margin:0 auto; padding:22px 18px 70px}
+    .wrap{max-width:var(--max); margin:0 auto; padding:22px 18px 80px}
+
     .topbar{
+      position:sticky; top:14px; z-index:10;
       display:flex; align-items:center; justify-content:space-between;
       gap:12px;
       padding:14px 16px;
       border:1px solid var(--border);
-      background:linear-gradient(180deg, var(--surface2), var(--surface));
-      border-radius:var(--radius2);
-      backdrop-filter: blur(10px);
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.05));
+      backdrop-filter: blur(14px);
       box-shadow: var(--shadow);
-      position: sticky; top: 14px; z-index: 5;
     }
+
     .brand{
-      display:flex; align-items:center; gap:10px; text-decoration:none;
-      font-weight:800; letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:-.2px;
     }
     .logo{
-      width:34px; height:34px; border-radius:12px;
-      background: radial-gradient(circle at 30% 30%, var(--brand), transparent 55%),
-                  radial-gradient(circle at 70% 70%, var(--brand2), transparent 55%),
-                  rgba(255,255,255,.08);
+      width:36px; height:36px;
+      border-radius:14px;
       border:1px solid var(--border);
+      background:
+        radial-gradient(circle at 30% 30%, rgba(100,210,255,.95), transparent 55%),
+        radial-gradient(circle at 70% 70%, rgba(167,139,250,.85), transparent 55%),
+        rgba(255,255,255,.06);
+      box-shadow: 0 10px 28px rgba(0,0,0,.22);
     }
-    nav{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
-    .chip{
+
+    nav{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .pillLink{
       text-decoration:none;
       padding:8px 10px;
-      border-radius:999px;
+      border-radius: 999px;
       border:1px solid var(--border);
-      background:rgba(255,255,255,.03);
-      color:var(--muted);
-      font-weight:600;
-      font-size:14px;
-    }
-    .chip:hover{background:rgba(255,255,255,.06); color:var(--text)}
-    .right{display:flex; align-items:center; gap:10px}
-    .btn{
-      appearance:none; border:1px solid var(--border);
-      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
-      color:var(--text);
-      border-radius:12px;
-      padding:10px 12px;
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
       font-weight:700;
-      cursor:pointer;
-      font-family:inherit;
       font-size:14px;
+      transition: transform .12s, background .12s;
     }
-    .btn:hover{background:rgba(255,255,255,.09)}
-    .btn:focus-visible, .chip:focus-visible, .input:focus-visible{
-      outline: 3px solid rgba(110,231,255,.35);
+    .pillLink:hover{background: rgba(255,255,255,.07); color: var(--text); transform: translateY(-1px)}
+
+    .right{display:flex; gap:10px; align-items:center}
+
+    .btn{
+      appearance:none;
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+      color: var(--text);
+      border-radius: 14px;
+      padding:10px 12px;
+      font-family:inherit;
+      font-weight:800;
+      font-size:14px;
+      cursor:pointer;
+      transition: transform .12s, background .12s;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn:hover{background: rgba(255,255,255,.10); transform: translateY(-1px)}
+
+    .btn.primary{
+      border-color: rgba(100,210,255,.26);
+      background: linear-gradient(180deg, rgba(100,210,255,.20), rgba(167,139,250,.10));
+    }
+
+    .kbd{
+      font-family: var(--mono);
+      font-size:12px;
+      font-weight:700;
+      color: var(--muted);
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      padding:6px 8px;
+      border-radius: 12px;
+    }
+
+    .btn:focus-visible,
+    .pillLink:focus-visible,
+    .input:focus-visible,
+    .gcard:focus-within{
+      outline: 3px solid var(--ring);
       outline-offset: 2px;
     }
-    .btn.primary{
-      border-color: rgba(110,231,255,.30);
-      background: linear-gradient(180deg, rgba(110,231,255,.18), rgba(167,139,250,.10));
-    }
+
     .hero{
       margin-top:18px;
-      padding:40px 28px 28px;
-      border-radius:var(--radius2);
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border-radius: var(--radius2);
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
       box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
     }
-    .heroGrid{
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(620px 460px at 18% 20%, rgba(100,210,255,.22), transparent 60%),
+                radial-gradient(640px 520px at 92% 24%, rgba(167,139,250,.20), transparent 60%),
+                radial-gradient(560px 520px at 60% 120%, rgba(34,197,94,.12), transparent 60%);
+      opacity:.9;
+      pointer-events:none;
+    }
+
+    .heroInner{
+      position:relative;
+      padding: 46px 28px 26px;
       display:grid;
-      grid-template-columns: 1.35fr .65fr;
+      grid-template-columns: 1.2fr .8fr;
       gap:18px;
       align-items:start;
     }
-    h1{
-      font-size: clamp(30px, 4vw, 46px);
-      line-height:1.07;
-      margin:0 0 12px;
-      letter-spacing:-.6px;
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
+      font-weight:800;
+      font-size:13px;
+      letter-spacing:.2px;
     }
-    .lead{margin:0 0 18px; color:var(--muted); font-size:16px}
-    .searchRow{display:flex; gap:10px; flex-wrap:wrap}
+
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(34px, 4.6vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -1.0px;
+    }
+
+    .lead{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 16px;
+      font-weight: 600;
+      max-width: 56ch;
+    }
+
+    .searchBar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      padding: 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03));
+      box-shadow: 0 14px 40px rgba(0,0,0,.25);
+    }
+
     .input{
       flex: 1 1 360px;
-      min-width: 260px;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid var(--border);
+      min-width: 240px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
       background: rgba(0,0,0,.18);
-      color:var(--text);
-      font-weight:600;
-      font-family:inherit;
-      font-size:14px;
+      color: var(--text);
+      padding: 12px 14px;
+      font-family: inherit;
+      font-weight: 650;
+      font-size: 14px;
     }
-    [data-theme="light"] .input{background: rgba(255,255,255,.75)}
-    .kbd{
-      display:inline-flex; align-items:center; gap:6px;
-      color:var(--muted);
-      font-weight:700; font-size:13px;
-      border:1px dashed var(--border);
-      padding:8px 10px;
-      border-radius:12px;
-      user-select:none;
-    }
-    .stats{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    .stat{
-      padding:14px;
-      border-radius:16px;
-      border:1px solid var(--border);
+    [data-theme="light"] .input{background: rgba(255,255,255,.78)}
+
+    .heroAside{display:grid; gap:12px; align-content:start}
+    .metric{
+      border-radius: 22px;
+      border: 1px solid var(--border);
       background: rgba(255,255,255,.04);
+      padding: 14px;
+      position:relative;
+      overflow:hidden;
     }
-    .stat b{display:block; font-size:22px; margin-bottom:2px;}
-    .stat span{color:var(--muted); font-weight:600; font-size:12px}
+    .metric::before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(420px 280px at 20% 0%, rgba(100,210,255,.16), transparent 60%),
+                radial-gradient(420px 280px at 100% 20%, rgba(167,139,250,.14), transparent 60%);
+      opacity:.8;
+      pointer-events:none;
+    }
+    .metricInner{position:relative}
+    .metric b{display:block; font-size:22px; letter-spacing:-.6px}
+    .metric span{display:block; margin-top:2px; color: var(--muted); font-weight:700; font-size:12px}
+
+    .sections{margin-top:18px; display:grid; gap:18px}
     .section{
-      margin-top:18px;
-      padding:22px;
-      border-radius:var(--radius2);
+      border-radius: var(--radius2);
       border:1px solid var(--border);
-      background: rgba(255,255,255,.035);
+      background: rgba(255,255,255,.03);
+      padding: 22px;
     }
     .sectionHead{
-      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
-      margin-bottom:12px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:12px;
+      margin-bottom: 12px;
     }
-    .section h2{margin:0; font-size:20px; letter-spacing:-.2px}
-    .section p{margin:4px 0 0; color:var(--muted); font-weight:600; font-size:14px}
+    .section h2{margin:0; font-size: 18px; letter-spacing:-.3px}
+    .section p{margin:4px 0 0; color: var(--muted); font-weight:650; font-size: 14px}
+
     .grid{
+      margin-top: 12px;
       display:grid;
       grid-template-columns: repeat(12, 1fr);
-      gap:12px;
-      margin-top:12px;
+      gap: 12px;
     }
-    .card{
+
+    .gcard{
       grid-column: span 4;
-      padding:16px;
-      border-radius:18px;
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      position:relative;
+      padding: 16px;
+      border-radius: 22px;
+      color: inherit;
       text-decoration:none;
-      display:flex; flex-direction:column; gap:10px;
-      min-height: 128px;
-      transition: background .15s;
+      background: rgba(255,255,255,.03);
+      border: 1px solid transparent;
+      box-shadow: 0 16px 50px rgba(0,0,0,.24);
+      overflow:hidden;
+      transform: translateZ(0);
+      transition: transform .14s ease, background .14s ease;
     }
-    .card:hover{background: rgba(255,255,255,.07)}
-    .cardTop{
-      display:flex; justify-content:space-between; gap:10px; align-items:flex-start
+    .gcard::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      padding:1px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, rgba(100,210,255,.55), rgba(167,139,250,.45), rgba(34,197,94,.28));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events:none;
+      opacity:.7;
     }
-    .title{font-weight:800; letter-spacing:-.2px; color:var(--text);}
-    .meta{display:flex; gap:8px; flex-wrap:wrap; color:var(--muted); font-weight:700; font-size:13px}
-    .badge{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px; border-radius:999px;
+    .gcard::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(420px 240px at 30% 10%, rgba(100,210,255,.18), transparent 60%),
+                radial-gradient(420px 260px at 90% 20%, rgba(167,139,250,.14), transparent 60%);
+      opacity:.55;
+      pointer-events:none;
+    }
+    .gcard:hover{transform: translateY(-3px); background: rgba(255,255,255,.05)}
+
+    .cardTop{display:flex; align-items:flex-start; justify-content:space-between; gap:12px; position:relative}
+    .cardTitle{font-weight:900; letter-spacing:-.2px}
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 10px;
+      border-radius: 999px;
       border:1px solid var(--border);
       background: rgba(255,255,255,.04);
-      color:var(--muted);
-      font-weight:800; font-size:12px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 12px;
+      position:relative;
+      z-index:1;
     }
-    .badge.ok{color: rgba(34,197,94,.95); border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.10)}
-    .badge.warn{color: rgba(245,158,11,.95); border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.10)}
-    .list{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
+    .chip.good{color: rgba(34,197,94,.95); border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.10)}
+    .chip.warn{color: rgba(245,158,11,.95); border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.10)}
+
+    .meta{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; position:relative; z-index:1}
+    .desc{margin-top:10px; color: var(--muted); font-weight:650; font-size: 13px; position:relative; z-index:1}
+
+    .list{margin-top:12px; display:grid; gap:10px}
     .row{
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.03);
-      border-radius:18px;
-      padding:14px 16px;
       display:flex; align-items:center; justify-content:space-between; gap:12px;
       text-decoration:none;
-      transition: background .15s;
-    }
-    .row:hover{background: rgba(255,255,255,.06)}
-    .rowLeft{display:flex; flex-direction:column; gap:4px}
-    .rowTitle{font-weight:850; color:var(--text);}
-    .rowSub{color:var(--muted); font-weight:700; font-size:13px}
-    .rowRight{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
-    footer{
-      margin-top:18px;
-      padding:22px;
-      border-radius:var(--radius2);
-      border:1px solid var(--border);
+      color: inherit;
+      border-radius: 20px;
+      border: 1px solid var(--border);
       background: rgba(255,255,255,.03);
-      color:var(--muted);
+      padding: 14px 16px;
+      transition: transform .12s, background .12s;
+    }
+    .row:hover{transform: translateY(-2px); background: rgba(255,255,255,.05)}
+
+    .rowTitle{font-weight:900}
+    .rowSub{margin-top:2px; color: var(--muted); font-weight:650; font-size:13px}
+
+    footer{
+      margin-top: 18px;
+      padding: 22px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      color: var(--muted);
       font-weight:650;
-      font-size:14px;
+      font-size: 14px;
     }
-    .footGrid{
-      display:grid;
-      grid-template-columns: 1.2fr 1fr 1fr;
-      gap:12px;
-      margin-top:16px;
-    }
+    .footGrid{margin-top:14px; display:grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 12px}
     .footGrid a{color:inherit; text-decoration:none}
-    .footGrid a:hover{color:var(--text)}
-    .mutedSmall{font-size:13px; color:var(--muted)}
+    .footGrid a:hover{color: var(--text)}
+
     .overlay{
-      position:fixed; inset:0;
-      background: rgba(0,0,0,.6);
-      display:none; align-items:center; justify-content:center;
-      padding:18px; z-index: 50;
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background: rgba(0,0,0,.62);
+      backdrop-filter: blur(6px);
+      z-index: 50;
     }
     .overlay.open{display:flex}
     .modal{
-      width:min(720px, 100%);
-      border-radius:20px;
-      border:1px solid var(--border);
-      background: linear-gradient(180deg, rgba(30,30,50,.98), rgba(20,20,38,.98));
-      backdrop-filter: blur(12px);
+      width:min(740px, 100%);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.05));
       box-shadow: var(--shadow);
-      padding:18px;
+      padding: 16px;
     }
-    [data-theme="light"] .modal{background: linear-gradient(180deg,#fff,#f7f8fc);}
-    .modalHead{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px}
-    .modalHead b{letter-spacing:-.2px; font-size:16px;}
-    .hint{color:var(--muted); font-weight:700; font-size:13px}
+    .modalHead{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px}
+    .modalHead b{font-weight:900; letter-spacing:-.2px}
+    .hint{color: var(--muted); font-weight:700; font-size: 13px}
+
     .results{margin-top:10px; display:grid; gap:8px}
-    .pill{
+    .result{
+      border-radius: 18px;
       border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      border-radius:14px;
-      padding:12px 14px;
-      display:flex; justify-content:space-between; gap:10px;
+      background: rgba(255,255,255,.03);
+      padding: 12px 14px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
       cursor:pointer;
-      transition: background .12s;
+      transition: background .12s, transform .12s;
     }
-    .pill:hover{background: rgba(255,255,255,.07);}
-    .pill span{color:var(--muted); font-weight:700; font-size:13px}
-    @media (max-width: 900px){
-      .heroGrid{grid-template-columns: 1fr}
-      .card{grid-column: span 6}
-      .footGrid{grid-template-columns: 1fr}
+    .result:hover{background: rgba(255,255,255,.06); transform: translateY(-1px)}
+    .result span{color: var(--muted); font-weight:650; font-size: 13px}
+
+    @media (max-width: 920px){
+      .heroInner{grid-template-columns: 1fr}
       nav{display:none}
+      .gcard{grid-column: span 6}
+      .footGrid{grid-template-columns: 1fr}
     }
     @media (max-width: 560px){
-      .card{grid-column: span 12}
-      .stats{grid-template-columns: 1fr}
+      .gcard{grid-column: span 12}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .btn,.pillLink,.gcard,.row,.result{transition:none}
+      body::before{opacity:.5}
     }
   </style>
 </head>
@@ -298,198 +461,210 @@
         <span class="logo" aria-hidden="true"></span>
         <span>CanonDB</span>
       </a>
+
       <nav aria-label="Навигация">
-        <a class="chip" href="#franchises">Франшизы</a>
-        <a class="chip" href="#chronologies">Хронологии</a>
-        <a class="chip" href="#activity">Активность</a>
-        <a class="chip" href="#about">О проекте</a>
+        <a class="pillLink" href="#franchises">Франшизы</a>
+        <a class="pillLink" href="#chronologies">Хронологии</a>
+        <a class="pillLink" href="#about">О проекте</a>
       </nav>
+
       <div class="right">
         <button class="btn" id="openSearch" type="button" aria-haspopup="dialog" aria-controls="searchModal">
-          Поиск <span class="mutedSmall">⌘K</span>
+          Поиск <span class="kbd">Ctrl K</span>
         </button>
-        <button class="btn" id="toggleTheme" type="button" aria-label="Переключить тему">☀︎ Тема</button>
+        <button class="btn" id="toggleTheme" type="button" aria-label="Переключить тему">Тема</button>
         <button class="btn primary" type="button">Войти</button>
       </div>
     </header>
 
     <main>
       <section class="hero" aria-labelledby="heroTitle">
-        <div class="heroGrid">
+        <div class="heroInner">
           <div>
-            <p class="mutedSmall" style="margin:0 0 10px; font-weight:800;">
-              Создано сообществом для сообщества
-            </p>
+            <span class="eyebrow">Канон, релиз или без спойлеров — один клик</span>
             <h1 id="heroTitle">Найдите правильный порядок просмотра</h1>
-            <p class="lead">Каноничные порядки для фильмов, сериалов, игр и аниме — составленные и проверенные участниками.</p>
-            <div class="searchRow" role="search">
+            <p class="lead">CanonDB — база порядков для фильмов, сериалов, игр и аниме. Всё в одном стиле: быстро, аккуратно, с фокусом на поиск.</p>
+
+            <div class="searchBar" role="search">
               <input class="input" id="q" placeholder="Например: Marvel, Star Wars, Ведьмак, Fate…" autocomplete="off" />
-              <button class="btn primary" id="searchBtn" type="button">Искать</button>
-              <span class="kbd" title="Открыть поиск">⌘K</span>
+              <button class="btn primary" id="searchBtn" type="button">Открыть поиск</button>
+              <span class="kbd" title="Быстрый доступ">⌘K</span>
             </div>
-            <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
-              <a class="badge" href="#franchises">Смотреть франшизы</a>
-              <a class="badge" href="#chronologies">Свежие хронологии</a>
-              <a class="badge" href="#rules">Правила</a>
+
+            <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+              <a class="pillLink" href="#franchises">Смотреть франшизы</a>
+              <a class="pillLink" href="#chronologies">Свежие хронологии</a>
+              <a class="pillLink" href="#footer">Правила и ссылки</a>
             </div>
           </div>
-          <div class="stats" aria-label="Статистика">
-            <div class="stat"><b>6+</b><span>Франшиз в базе</span></div>
-            <div class="stat"><b>8+</b><span>Хронологий</span></div>
-            <div class="stat"><b>8+</b><span>Участников</span></div>
-            <div class="stat"><b>∞</b><span>Каноничных споров</span></div>
-          </div>
+
+          <aside class="heroAside" aria-label="Быстрые метрики">
+            <div class="metric"><div class="metricInner"><b>6+</b><span>Франшиз</span></div></div>
+            <div class="metric"><div class="metricInner"><b>8+</b><span>Хронологий</span></div></div>
+            <div class="metric"><div class="metricInner"><b>8+</b><span>Участников</span></div></div>
+            <div class="metric"><div class="metricInner"><b>0</b><span>Шума в UI</span></div></div>
+          </aside>
         </div>
       </section>
 
-      <section class="section" id="franchises" aria-labelledby="frTitle">
-        <div class="sectionHead">
-          <div>
-            <h2 id="frTitle">Популярные франшизы</h2>
-            <p>Самые обсуждаемые медиавселенные</p>
+      <div class="sections">
+        <section class="section" id="franchises" aria-labelledby="frTitle">
+          <div class="sectionHead">
+            <div>
+              <h2 id="frTitle">Популярные франшизы</h2>
+              <p>Карточки с быстрыми метриками и аккуратными акцентами</p>
+            </div>
+            <a class="pillLink" href="#">Все франшизы</a>
           </div>
-          <a class="chip" href="#" style="display:inline-flex;">Все франшизы</a>
-        </div>
-        <div class="grid">
-          <a class="card" href="#">
-            <div class="cardTop">
-              <div class="title">Звёздные войны</div>
-              <span class="badge ok">★ 5.0</span>
-            </div>
-            <div class="meta">
-              <span class="badge">18 элементов</span>
-              <span class="badge">3 хронологии</span>
-            </div>
-            <div class="mutedSmall">От приквелов до спин-оффов — без спойлеров.</div>
-          </a>
-          <a class="card" href="#">
-            <div class="cardTop">
-              <div class="title">Marvel (MCU)</div>
-              <span class="badge warn">★ 4.0</span>
-            </div>
-            <div class="meta">
-              <span class="badge">13 элементов</span>
-              <span class="badge">1 хронология</span>
-            </div>
-            <div class="mutedSmall">Сортировка по фазам, релизу или таймлайну.</div>
-          </a>
-          <a class="card" href="#">
-            <div class="cardTop">
-              <div class="title">The Legend of Zelda</div>
-              <span class="badge">—</span>
-            </div>
-            <div class="meta">
-              <span class="badge">3 элемента</span>
-              <span class="badge">2 хронологии</span>
-            </div>
-            <div class="mutedSmall">Разные ветки таймлайна в одном порядке.</div>
-          </a>
-        </div>
-      </section>
 
-      <section class="section" id="chronologies" aria-labelledby="chTitle">
-        <div class="sectionHead">
-          <div>
-            <h2 id="chTitle">Недавние хронологии</h2>
-            <p>Свежие порядки просмотра от участников</p>
-          </div>
-          <a class="chip" href="#" style="display:inline-flex;">Все хронологии</a>
-        </div>
-        <div class="list" role="list">
-          <a class="row" href="#" role="listitem">
-            <div class="rowLeft">
-              <div class="rowTitle">Окарина</div>
-              <div class="rowSub">Франшиза: The Legend of Zelda</div>
-            </div>
-            <div class="rowRight">
-              <span class="badge">190 элементов</span>
-              <span class="badge">▲ 0 ▼ 0</span>
-            </div>
-          </a>
-          <a class="row" href="#" role="listitem">
-            <div class="rowLeft">
-              <div class="rowTitle">gfdgd</div>
-              <div class="rowSub">Франшиза: Звёздные войны</div>
-            </div>
-            <div class="rowRight">
-              <span class="badge">61 элемент</span>
-              <span class="badge">▲ 0 ▼ 0</span>
-            </div>
-          </a>
-          <a class="row" href="#" role="listitem">
-            <div class="rowLeft">
-              <div class="rowTitle">Суровая Россия</div>
-              <div class="rowSub">Франшиза: Блокировки</div>
-            </div>
-            <div class="rowRight">
-              <span class="badge">6010 элементов</span>
-              <span class="badge ok">▲ 2 ▼ 0</span>
-            </div>
-          </a>
-        </div>
-      </section>
+          <div class="grid">
+            <a class="gcard" href="#">
+              <div class="cardTop">
+                <div class="cardTitle">Звёздные войны</div>
+                <span class="chip good">★ 5.0</span>
+              </div>
+              <div class="meta">
+                <span class="chip">18 элементов</span>
+                <span class="chip">3 хронологии</span>
+              </div>
+              <div class="desc">Порядок по релизу, по хронологии и без спойлеров — на одном экране.</div>
+            </a>
 
-      <section class="section" id="about" aria-labelledby="aboutTitle">
-        <div class="sectionHead">
-          <div>
-            <h2 id="aboutTitle">Зачем CanonDB?</h2>
-            <p>Быстрый поиск, единые правила, прозрачная модерация</p>
-          </div>
-        </div>
-        <div class="grid">
-          <div class="card" style="grid-column: span 4;">
-            <div class="title">🔍 Поиск</div>
-            <div class="mutedSmall">Cmd+K / Ctrl+K — мгновенный доступ к любой франшизе или хронологии.</div>
-          </div>
-          <div class="card" style="grid-column: span 4;">
-            <div class="title">⭐ Качество</div>
-            <div class="mutedSmall">Оценки, обсуждения и понятные критерии «каноничности».</div>
-          </div>
-          <div class="card" style="grid-column: span 4;">
-            <div class="title">🤝 Сообщество</div>
-            <div class="mutedSmall">Участники создают и улучшают порядки просмотра вместе.</div>
-          </div>
-        </div>
-      </section>
+            <a class="gcard" href="#">
+              <div class="cardTop">
+                <div class="cardTitle">Marvel (MCU)</div>
+                <span class="chip warn">★ 4.0</span>
+              </div>
+              <div class="meta">
+                <span class="chip">13 элементов</span>
+                <span class="chip">1 хронология</span>
+              </div>
+              <div class="desc">Фазы, релизы, таймлайн событий — быстрые переключатели в шапке франшизы.</div>
+            </a>
 
-      <footer id="rules">
-        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
-          <div>
-            <div style="font-weight:900; color:var(--text); font-size:16px;">CanonDB</div>
-            <div class="mutedSmall" style="margin-top:4px;">Каноничные порядки просмотра медиаконтента.</div>
+            <a class="gcard" href="#">
+              <div class="cardTop">
+                <div class="cardTitle">The Legend of Zelda</div>
+                <span class="chip">—</span>
+              </div>
+              <div class="meta">
+                <span class="chip">3 элемента</span>
+                <span class="chip">2 хронологии</span>
+              </div>
+              <div class="desc">Ветки таймлайна сведены в понятную структуру без перегруза интерфейса.</div>
+            </a>
           </div>
-          <div class="mutedSmall">© 2026</div>
-        </div>
-        <div class="footGrid">
-          <div>
-            <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Навигация</div>
-            <div style="display:grid; gap:7px;">
-              <a href="#franchises">Франшизы</a>
-              <a href="#chronologies">Хронологии</a>
-              <a href="#about">О проекте</a>
+        </section>
+
+        <section class="section" id="chronologies" aria-labelledby="chTitle">
+          <div class="sectionHead">
+            <div>
+              <h2 id="chTitle">Недавние хронологии</h2>
+              <p>Строгий список + воздух и микровзаимодействия</p>
+            </div>
+            <a class="pillLink" href="#">Все хронологии</a>
+          </div>
+
+          <div class="list" role="list">
+            <a class="row" href="#" role="listitem">
+              <div>
+                <div class="rowTitle">Окарина</div>
+                <div class="rowSub">Франшиза: The Legend of Zelda</div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <span class="chip">190 элементов</span>
+                <span class="chip">▲ 0 ▼ 0</span>
+              </div>
+            </a>
+
+            <a class="row" href="#" role="listitem">
+              <div>
+                <div class="rowTitle">gfdgd</div>
+                <div class="rowSub">Франшиза: Звёздные войны</div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <span class="chip">61 элемент</span>
+                <span class="chip">▲ 0 ▼ 0</span>
+              </div>
+            </a>
+
+            <a class="row" href="#" role="listitem">
+              <div>
+                <div class="rowTitle">Суровая Россия</div>
+                <div class="rowSub">Франшиза: Блокировки</div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <span class="chip">6010 элементов</span>
+                <span class="chip good">▲ 2 ▼ 0</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <section class="section" id="about" aria-labelledby="aboutTitle">
+          <div class="sectionHead">
+            <div>
+              <h2 id="aboutTitle">Почему это удобно</h2>
+              <p>Минимум визуального шума, максимум смысла</p>
             </div>
           </div>
-          <div>
-            <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Категории</div>
-            <div style="display:grid; gap:7px;">
-              <a href="#">Фильмы</a>
-              <a href="#">Сериалы</a>
-              <a href="#">Аниме</a>
-              <a href="#">Игры</a>
-              <a href="#">Книги</a>
+
+          <div class="grid">
+            <div class="gcard" style="grid-column: span 4;">
+              <div class="cardTop"><div class="cardTitle">Командная палитра</div><span class="chip">⌘K</span></div>
+              <div class="desc">Единый вход в поиск и навигацию. Подходит для продвинутых пользователей и новичков.</div>
+            </div>
+            <div class="gcard" style="grid-column: span 4;">
+              <div class="cardTop"><div class="cardTitle">Структура контента</div><span class="chip">Канон</span></div>
+              <div class="desc">Франшиза → хронологии → элементы. Визуально читаемо и масштабируется на большие каталоги.</div>
+            </div>
+            <div class="gcard" style="grid-column: span 4;">
+              <div class="cardTop"><div class="cardTitle">Дизайн-система</div><span class="chip">UI</span></div>
+              <div class="desc">Переменные, единые радиусы, чипы и кнопки. Легко переносится на внутренние страницы.</div>
             </div>
           </div>
-          <div>
-            <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Информация</div>
-            <div style="display:grid; gap:7px;">
-              <a href="#">Правила</a>
-              <a href="#">Конфиденциальность</a>
-              <a href="mailto:support@canondb.ru">Контакты</a>
-              <a href="#">Поддержать проект</a>
+        </section>
+
+        <footer id="footer">
+          <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+            <div>
+              <div style="font-weight:900; color:var(--text);">CanonDB</div>
+              <div style="margin-top:4px;" class="hint">Прототип редизайна: главная страница.</div>
+            </div>
+            <div class="hint">© 2026</div>
+          </div>
+
+          <div class="footGrid">
+            <div>
+              <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Навигация</div>
+              <div style="display:grid; gap:7px;">
+                <a href="#franchises">Франшизы</a>
+                <a href="#chronologies">Хронологии</a>
+                <a href="#about">О проекте</a>
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Категории</div>
+              <div style="display:grid; gap:7px;">
+                <a href="#">Фильмы</a>
+                <a href="#">Сериалы</a>
+                <a href="#">Аниме</a>
+                <a href="#">Игры</a>
+                <a href="#">Книги</a>
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:900; color:var(--text); margin-bottom:8px;">Информация</div>
+              <div style="display:grid; gap:7px;">
+                <a href="#">Правила</a>
+                <a href="#">Конфиденциальность</a>
+                <a href="mailto:support@canondb.ru">Контакты</a>
+                <a href="#">Поддержать проект</a>
+              </div>
             </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </main>
   </div>
 
@@ -501,17 +676,22 @@
       </div>
       <input class="input" id="modalInput" style="width:100%;" placeholder="Начните вводить: Marvel, Star Wars, Zelda…" autocomplete="off" />
       <div class="results" id="results" aria-live="polite"></div>
-      <div class="mutedSmall" style="margin-top:10px;">
-        Это прототип — поиск работает по встроенному списку.
-      </div>
+      <div class="hint" style="margin-top:10px;">Это прототип — результаты из демонстрационного списка.</div>
     </div>
   </div>
 
   <script>
     const root = document.documentElement;
+
+    window.addEventListener('pointermove', (e) => {
+      const x = Math.round((e.clientX / window.innerWidth) * 100);
+      const y = Math.round((e.clientY / window.innerHeight) * 100);
+      root.style.setProperty('--mx', x + 'vw');
+      root.style.setProperty('--my', y + 'vh');
+    }, { passive: true });
+
     const stored = localStorage.getItem('theme');
     if (stored) root.setAttribute('data-theme', stored);
-
     document.getElementById('toggleTheme').addEventListener('click', () => {
       const cur = root.getAttribute('data-theme') || 'dark';
       const next = cur === 'dark' ? 'light' : 'dark';
@@ -532,36 +712,48 @@
       { title: 'Суровая Россия', kind: 'Хронология', hint: '6010 элементов' },
     ];
 
-    function esc(s){ return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+    const esc = (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 
-    function render(q) {
-      const t = (q||'').trim().toLowerCase();
-      const items = demo.filter(x => (x.title+' '+x.kind).toLowerCase().includes(t)).slice(0,6);
+    function render(q){
+      const t = (q || '').trim().toLowerCase();
+      const items = demo.filter(x => (x.title + ' ' + x.kind).toLowerCase().includes(t)).slice(0,6);
       results.innerHTML = items.length
-        ? items.map(x => `<div class="pill"><div><div style="font-weight:800">${esc(x.title)}</div><span>${esc(x.kind)} · ${esc(x.hint)}</span></div><span>↵</span></div>`).join('')
-        : '<div class="mutedSmall">Ничего не найдено.</div>';
+        ? items.map(x => `
+          <div class="result" tabindex="0" role="button" aria-label="Открыть: ${esc(x.title)}">
+            <div>
+              <div style="font-weight:900">${esc(x.title)}</div>
+              <span>${esc(x.kind)} · ${esc(x.hint)}</span>
+            </div>
+            <span class="kbd">↵</span>
+          </div>
+        `).join('')
+        : '<div class="hint">Ничего не найдено.</div>';
     }
 
-    function openModal() {
+    function openModal(){
       overlay.classList.add('open');
       overlay.setAttribute('aria-hidden','false');
-      setTimeout(()=>modalInput.focus(),0);
+      setTimeout(() => modalInput.focus(), 0);
       render('');
     }
-    function closeModal() {
+
+    function closeModal(){
       overlay.classList.remove('open');
       overlay.setAttribute('aria-hidden','true');
     }
 
     document.getElementById('openSearch').addEventListener('click', openModal);
     document.getElementById('searchBtn').addEventListener('click', openModal);
-    document.getElementById('q').addEventListener('keydown', e => { if(e.key==='Enter') openModal(); });
-    overlay.addEventListener('click', e => { if(e.target===overlay) closeModal(); });
-    window.addEventListener('keydown', e => {
-      if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); openModal(); }
-      if(e.key==='Escape') closeModal();
+    document.getElementById('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') openModal(); });
+
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    window.addEventListener('keydown', (e) => {
+      const k = (e.key || '').toLowerCase();
+      if ((e.metaKey || e.ctrlKey) && k === 'k') { e.preventDefault(); openModal(); }
+      if (e.key === 'Escape') closeModal();
     });
-    modalInput.addEventListener('input', e => render(e.target.value));
+
+    modalInput.addEventListener('input', (e) => render(e.target.value));
   </script>
 </body>
 </html>
